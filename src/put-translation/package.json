@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "npx typescript -b -w",
-		"compile": "npx rimraf dist && npx tsc -b"
+    "watch": "tsc -b -w",
+		"compile": "npx rimraf dist && tsc -b"
   },
   "author": "Eric Johnson",
   "license": "MIT-0",
