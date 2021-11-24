@@ -1,7 +1,7 @@
 module.exports = {
-  roots: ["<rootDir>/test", "<rootDir>/src"],
+  roots: ["<rootDir>/test", "<rootDir>/packages"],
   testMatch: ["**/*.test.ts"],
-  testPathIgnorePatterns: ["/node_modules/", "/dist/", "/.aws-sam/"],
+  testPathIgnorePatterns: ["/node_modules/", "/cdk.out/", "/.aws-sam/"],
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },

@@ -4,6 +4,6 @@
         "bootstrap": {}
     },
     "packages": [
-        "src/*"
+        "packages/*"
     ]
 }

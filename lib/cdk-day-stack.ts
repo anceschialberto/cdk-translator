@@ -40,7 +40,7 @@ export class CdkDayStack extends cdk.Stack {
       "PutTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
-        entry: "src/put-translation/src/app.ts",
+        entry: "packages/put-translation/src/app.ts",
         handler: "handler",
         bundling: {
           environment: {
@@ -83,7 +83,7 @@ export class CdkDayStack extends cdk.Stack {
       "GetTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
-        entry: "src/get-translation/src/app.ts",
+        entry: "packages/get-translation/src/app.ts",
         handler: "handler",
         bundling: {
           environment: {
@@ -115,7 +115,7 @@ export class CdkDayStack extends cdk.Stack {
       "SaveTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
-        entry: "src/save-translation/src/app.ts",
+        entry: "packages/save-translation/src/app.ts",
         handler: "handler",
         bundling: {
           environment: {
