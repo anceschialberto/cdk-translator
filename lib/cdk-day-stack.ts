@@ -10,6 +10,9 @@ import { Runtime } from "@aws-cdk/aws-lambda";
 import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
 import { CfnOutput } from "@aws-cdk/core";
 
+const DUMMY_PACKAGE_JSON =
+  '{\n\t\\"name\\": \\"dummy\\",\n\t\\"version\\": \\"0.0.1\\"\n}';
+
 export class CdkDayStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -33,18 +36,22 @@ export class CdkDayStack extends cdk.Stack {
     // Put translation function
     // ###################################################
     const putTranslationFunction = new NodejsFunction(
-      this as any,
+      this,
       "PutTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
         entry: "src/put-translation/src/app.ts",
         handler: "handler",
-        depsLockFilePath: "src/put-translation/package-lock.json",
         bundling: {
+          environment: {
+            NODE_ENV: "production",
+          },
           commandHooks: {
             beforeBundling(inputDir: string, outputDir: string): any {},
             afterBundling(inputDir: string, outputDir: string): string[] {
-              return [`cp ${inputDir}/package.json ${outputDir}`];
+              return [
+                `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
+              ];
             },
             beforeInstall(inputDir: string, outputDir: string): any {},
           },
@@ -72,18 +79,22 @@ export class CdkDayStack extends cdk.Stack {
     // Get translations function
     // ###################################################
     const getTranslationFunction = new NodejsFunction(
-      this as any,
+      this,
       "GetTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
         entry: "src/get-translation/src/app.ts",
         handler: "handler",
-        depsLockFilePath: "src/get-translation/package-lock.json",
         bundling: {
+          environment: {
+            NODE_ENV: "production",
+          },
           commandHooks: {
             beforeBundling(inputDir: string, outputDir: string): any {},
             afterBundling(inputDir: string, outputDir: string): string[] {
-              return [`cp ${inputDir}/package.json ${outputDir}`];
+              return [
+                `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
+              ];
             },
             beforeInstall(inputDir: string, outputDir: string): any {},
           },
@@ -100,18 +111,22 @@ export class CdkDayStack extends cdk.Stack {
     // Save translations function
     // ###################################################
     const saveTranslationFunction = new NodejsFunction(
-      this as any,
+      this,
       "SaveTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
         entry: "src/save-translation/src/app.ts",
         handler: "handler",
-        depsLockFilePath: "src/save-translation/package-lock.json",
         bundling: {
+          environment: {
+            NODE_ENV: "production",
+          },
           commandHooks: {
             beforeBundling(inputDir: string, outputDir: string): any {},
             afterBundling(inputDir: string, outputDir: string): string[] {
-              return [`cp ${inputDir}/package.json ${outputDir}`];
+              return [
+                `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
+              ];
             },
             beforeInstall(inputDir: string, outputDir: string): any {},
           },

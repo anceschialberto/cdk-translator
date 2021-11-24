@@ -2,13 +2,13 @@
  *  SPDX-License-Identifier: MIT-0
  */
 
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { DynamoDB, QueryCommandOutput } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 const dynamoClient = new DynamoDB({});
 const TableName = process.env.TRANSLATE_TABLE;
 
-exports.getOne = async function (id: any) {
+const getOne = async (id: any) => {
   const dynamoParams = {
     TableName,
     ExpressionAttributeValues: marshall({
@@ -19,7 +19,7 @@ exports.getOne = async function (id: any) {
   return dynamoClient.query(dynamoParams);
 };
 
-exports.getAll = async function () {
+const getAll = async () => {
   const dynamoParams = {
     TableName,
     ExpressionAttributeNames: {
@@ -34,14 +34,14 @@ exports.getAll = async function () {
 };
 
 export const handler = async function (event: any) {
-  let response;
+  let response: QueryCommandOutput;
   try {
     if (event.pathParameters && event.pathParameters.id)
-      response = await exports.getOne(event.pathParameters.id);
-    else response = await exports.getAll();
+      response = await getOne(event.pathParameters.id);
+    else response = await getAll();
 
     return {
-      Items: response.Items.map((item: any) => {
+      Items: response.Items?.map((item) => {
         const data = unmarshall(item);
         delete data.language;
         return data;

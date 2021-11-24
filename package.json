@@ -8,10 +8,9 @@
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "setup": "npx lerna clean --yes && npx lerna bootstrap",
-    "watch": "npx lerna run watch",
-    "compile": "npx lerna run compile",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy": "cdk deploy -a .aws-sam/build --profile personal"
   },
   "devDependencies": {
     "@aws-cdk/assert": "1.134.0",

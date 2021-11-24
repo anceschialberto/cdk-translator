@@ -14,7 +14,7 @@ import {
 const translateClient = new TranslateClient({});
 const eventBridgeClient = new EventBridgeClient({});
 
-exports.buildTranslationRequest = function (language: any, text: any) {
+const buildTranslationRequest = (language: any, text: any) => {
   const translateParams = {
     SourceLanguageCode: "en",
     TargetLanguageCode: language,
@@ -24,7 +24,7 @@ exports.buildTranslationRequest = function (language: any, text: any) {
   return translateClient.send(translateCommand);
 };
 
-exports.buildEventBridgePackage = function (translations: any, id: any) {
+const buildEventBridgePackage = (translations: any, id: any) => {
   const entries = translations.map((item: any) => {
     item["id"] = id;
     return {
@@ -39,13 +39,13 @@ exports.buildEventBridgePackage = function (translations: any, id: any) {
   };
 };
 
-exports.handler = async function (event: any) {
+export const handler = async (event: any) => {
   const body = JSON.parse(event.body);
   const translateText = body.text;
   const lang = body.languages;
 
   const translations = lang.map((item: any) => {
-    return exports.buildTranslationRequest(item, translateText);
+    return buildTranslationRequest(item, translateText);
   });
 
   try {
@@ -61,7 +61,7 @@ exports.handler = async function (event: any) {
 
     // send events to eventbridge
     const eventBridgeCommand = new PutEventsCommand(
-      exports.buildEventBridgePackage(data, event.requestContext.requestId)
+      buildEventBridgePackage(data, event.requestContext.requestId)
     );
 
     const ebresults = await eventBridgeClient.send(eventBridgeCommand);

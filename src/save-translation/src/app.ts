@@ -8,7 +8,7 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 const dynamoClient = new DynamoDB({});
 const TableName = process.env.TRANSLATE_TABLE;
 
-exports.handler = async function (event: any) {
+export const handler = async (event: any) => {
   const Item = marshall(event.detail);
 
   console.log(JSON.stringify(event));
