@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "get-translation:src/app.handler (nodejs14.x)",
+            "invokeTarget": {
+                "target": "code",
+                "projectRoot": "${workspaceFolder}/src/get-translation",
+                "lambdaHandler": "src/app.handler"
+            },
+            "lambda": {
+                "runtime": "nodejs14.x",
+                "payload": {
+                    "path": "${workspaceFolder}/events/getTranslation.json"
+                },
+                "environmentVariables": {
+                    "TRANSLATE_TABLE": "CdkDayStack-TranslateTable1ABF9811-PA3E8Y1FWAO0"
+                }
+            },
+            "aws": {
+                "credentials": "profile:personal"
+            }
+        }
+    ]
+}
