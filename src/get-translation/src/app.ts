@@ -9,11 +9,11 @@ import { APIGatewayEvent } from "aws-lambda";
 const dynamoClient = new DynamoDB({});
 const TableName = process.env.TRANSLATE_TABLE;
 
-const getOne = async (id: any) => {
+const getOne = async (id: string) => {
   const dynamoParams = {
     TableName,
     ExpressionAttributeValues: marshall({
-      ":i": id as string,
+      ":i": id,
     }),
     KeyConditionExpression: "id = :i",
   };
