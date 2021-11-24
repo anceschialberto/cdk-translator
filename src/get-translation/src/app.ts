@@ -4,6 +4,7 @@
 
 import { DynamoDB, QueryCommandOutput } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+import { APIGatewayEvent } from "aws-lambda";
 
 const dynamoClient = new DynamoDB({});
 const TableName = process.env.TRANSLATE_TABLE;
@@ -12,7 +13,7 @@ const getOne = async (id: any) => {
   const dynamoParams = {
     TableName,
     ExpressionAttributeValues: marshall({
-      ":i": id,
+      ":i": id as string,
     }),
     KeyConditionExpression: "id = :i",
   };
@@ -33,7 +34,7 @@ const getAll = async () => {
   return dynamoClient.scan(dynamoParams);
 };
 
-export const handler = async function (event: any) {
+export const handler = async function (event: APIGatewayEvent) {
   let response: QueryCommandOutput;
   try {
     if (event.pathParameters && event.pathParameters.id)
@@ -48,6 +49,7 @@ export const handler = async function (event: any) {
       }),
     };
   } catch (error) {
-    throw new Error((error as any).message);
+    if (error instanceof Error) throw new Error(error.message);
+    else throw error;
   }
 };

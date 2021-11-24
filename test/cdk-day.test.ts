@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import {
   expect as expectCDK,
   matchTemplate,

@@ -10,11 +10,12 @@ import {
   EventBridgeClient,
   PutEventsCommand,
 } from "@aws-sdk/client-eventbridge";
+import { APIGatewayEvent } from "aws-lambda";
 
 const translateClient = new TranslateClient({});
 const eventBridgeClient = new EventBridgeClient({});
 
-const buildTranslationRequest = (language: any, text: any) => {
+const buildTranslationRequest = (language: string, text: string) => {
   const translateParams = {
     SourceLanguageCode: "en",
     TargetLanguageCode: language,
@@ -24,8 +25,15 @@ const buildTranslationRequest = (language: any, text: any) => {
   return translateClient.send(translateCommand);
 };
 
-const buildEventBridgePackage = (translations: any, id: any) => {
-  const entries = translations.map((item: any) => {
+const buildEventBridgePackage = (
+  translations: Array<{
+    id?: string;
+    language?: string;
+    translation?: string;
+  }>,
+  id: string
+) => {
+  const entries = translations.map((item) => {
     item["id"] = id;
     return {
       Detail: JSON.stringify(item),
@@ -39,19 +47,22 @@ const buildEventBridgePackage = (translations: any, id: any) => {
   };
 };
 
-export const handler = async (event: any) => {
-  const body = JSON.parse(event.body);
+export const handler = async (event: APIGatewayEvent) => {
+  const body = JSON.parse(event.body ?? "{}") as {
+    text: string;
+    languages: Array<string>;
+  };
   const translateText = body.text;
   const lang = body.languages;
 
-  const translations = lang.map((item: any) => {
+  const translations = lang.map((item) => {
     return buildTranslationRequest(item, translateText);
   });
 
   try {
     // get translations
     const translateResponse = await Promise.all(translations);
-    const data = translateResponse.map((item: any) => {
+    const data = translateResponse.map((item) => {
       return {
         language: item.TargetLanguageCode,
         translation: item.TranslatedText,
@@ -69,6 +80,7 @@ export const handler = async (event: any) => {
 
     return { id: event.requestContext.requestId, Items: data };
   } catch (error) {
-    throw new Error((error as any).message);
+    if (error instanceof Error) throw new Error(error.message);
+    else throw error;
   }
 };
