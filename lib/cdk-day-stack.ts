@@ -37,7 +37,7 @@ export class CdkDayStack extends cdk.Stack {
       "PutTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
-        entry: "src/put-translation/app.ts",
+        entry: "src/put-translation/src/app.ts",
         handler: "handler",
         depsLockFilePath: "src/put-translation/package-lock.json",
         bundling: {
@@ -76,7 +76,7 @@ export class CdkDayStack extends cdk.Stack {
       "GetTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
-        entry: "src/get-translation/app.ts",
+        entry: "src/get-translation/src/app.ts",
         handler: "handler",
         depsLockFilePath: "src/get-translation/package-lock.json",
         bundling: {
@@ -104,7 +104,7 @@ export class CdkDayStack extends cdk.Stack {
       "SaveTranslationFunction",
       {
         runtime: Runtime.NODEJS_14_X,
-        entry: "src/save-translation/app.ts",
+        entry: "src/save-translation/src/app.ts",
         handler: "handler",
         depsLockFilePath: "src/save-translation/package-lock.json",
         bundling: {

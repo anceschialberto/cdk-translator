@@ -33,7 +33,7 @@ exports.getAll = async function () {
   return dynamoClient.scan(dynamoParams);
 };
 
-exports.handler = async function (event: any) {
+export const handler = async function (event: any) {
   let response;
   try {
     if (event.pathParameters && event.pathParameters.id)
