@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc -b -w",
-		"compile": "npx rimraf dist && tsc -b"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eric Johnson",
   "license": "MIT-0",
