@@ -10,7 +10,7 @@
   "include": [
     "bin/**/*.ts",
     "lib/**/*.ts",
-    "packages/**/*.ts",
+    "app/**/*.ts",
     "pipeline/**/*.ts",
     "test/**/*.ts",
     ".eslintrc.js",

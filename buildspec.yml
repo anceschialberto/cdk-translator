@@ -9,8 +9,8 @@ phases:
       - pip3 install --upgrade aws-sam-cli
       - sam --version
       # Installing project dependencies
-      - npm run setup
       - npm install
+      - npm run setup
   
   pre_build:
     commands:

@@ -4,6 +4,7 @@
         "bootstrap": {}
     },
     "packages": [
-        "packages/*"
+        "app/*",
+        "pipeline/*"
     ]
 }

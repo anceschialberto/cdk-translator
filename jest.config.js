@@ -1,5 +1,5 @@
 module.exports = {
-  roots: ["<rootDir>/test", "<rootDir>/packages", "<rootDir>/pipeline"],
+  roots: ["<rootDir>/test", "<rootDir>/app", "<rootDir>/pipeline"],
   testMatch: ["**/*.test.ts"],
   testPathIgnorePatterns: ["/node_modules/", "/cdk.out/", "/.aws-sam/"],
   transform: {

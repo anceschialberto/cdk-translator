@@ -30,7 +30,7 @@
             "name": "put-translation:src/app.handler (nodejs14.x)",
             "invokeTarget": {
                 "target": "code",
-                "projectRoot": "${workspaceFolder}/packages/put-translation",
+                "projectRoot": "${workspaceFolder}/app/put-translation",
                 "lambdaHandler": "src/app.handler"
             },
             "lambda": {
@@ -52,7 +52,7 @@
             "name": "get-translation:src/app.handler (nodejs14.x)",
             "invokeTarget": {
                 "target": "code",
-                "projectRoot": "${workspaceFolder}/packages/get-translation",
+                "projectRoot": "${workspaceFolder}/app/get-translation",
                 "lambdaHandler": "src/app.handler"
             },
             "lambda": {
