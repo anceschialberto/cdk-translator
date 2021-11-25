@@ -765,7 +765,7 @@ test("Empty Stack", () => {
                     },
                   },
                 ],
-                Image: "aws/codebuild/amazonlinux2-x86_64-standard:2.0",
+                Image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0",
                 ImagePullCredentialsType: "CODEBUILD",
                 PrivilegedMode: false,
                 Type: "LINUX_CONTAINER",
