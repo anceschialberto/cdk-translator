@@ -91,6 +91,14 @@ test("Empty Stack", () => {
               PolicyDocument: {
                 Statement: [
                   {
+                    Action: [
+                      "xray:PutTraceSegments",
+                      "xray:PutTelemetryRecords",
+                    ],
+                    Effect: "Allow",
+                    Resource: "*",
+                  },
+                  {
                     Action: "events:PutEvents",
                     Effect: "Allow",
                     Resource: {
@@ -166,6 +174,9 @@ test("Empty Stack", () => {
               },
               Handler: "index.handler",
               Runtime: "nodejs14.x",
+              TracingConfig: {
+                Mode: "Active",
+              },
             },
             DependsOn: [
               "PutTranslationFunctionServiceRoleDefaultPolicyB878D483",
@@ -229,6 +240,14 @@ test("Empty Stack", () => {
             Properties: {
               PolicyDocument: {
                 Statement: [
+                  {
+                    Action: [
+                      "xray:PutTraceSegments",
+                      "xray:PutTelemetryRecords",
+                    ],
+                    Effect: "Allow",
+                    Resource: "*",
+                  },
                   {
                     Action: [
                       "dynamodb:BatchGetItem",
@@ -318,6 +337,9 @@ test("Empty Stack", () => {
               },
               Handler: "index.handler",
               Runtime: "nodejs14.x",
+              TracingConfig: {
+                Mode: "Active",
+              },
             },
             DependsOn: [
               "GetTranslationFunctionServiceRoleDefaultPolicy7862AC6E",
@@ -360,6 +382,14 @@ test("Empty Stack", () => {
             Properties: {
               PolicyDocument: {
                 Statement: [
+                  {
+                    Action: [
+                      "xray:PutTraceSegments",
+                      "xray:PutTelemetryRecords",
+                    ],
+                    Effect: "Allow",
+                    Resource: "*",
+                  },
                   {
                     Action: [
                       "dynamodb:BatchWriteItem",
@@ -446,6 +476,9 @@ test("Empty Stack", () => {
               },
               Handler: "index.handler",
               Runtime: "nodejs14.x",
+              TracingConfig: {
+                Mode: "Active",
+              },
             },
             DependsOn: [
               "SaveTranslationFunctionServiceRoleDefaultPolicyE1167723",

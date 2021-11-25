@@ -11,6 +11,7 @@
     "bin/**/*.ts",
     "lib/**/*.ts",
     "packages/**/*.ts",
+    "pipeline/**/*.ts",
     "test/**/*.ts",
     ".eslintrc.js",
     "jest.config.js"
