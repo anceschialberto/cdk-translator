@@ -6,12 +6,20 @@ import { AttributeType, Table } from "@aws-cdk/aws-dynamodb";
 import { EventBus, Rule } from "@aws-cdk/aws-events";
 import { LambdaFunction } from "@aws-cdk/aws-events-targets";
 import { Policy, PolicyStatement } from "@aws-cdk/aws-iam";
-import { Runtime } from "@aws-cdk/aws-lambda";
+import { Runtime, Tracing } from "@aws-cdk/aws-lambda";
 import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
 import { CfnOutput } from "@aws-cdk/core";
 
 const DUMMY_PACKAGE_JSON =
   '{\n\t\\"name\\": \\"dummy\\",\n\t\\"version\\": \\"0.0.1\\"\n}';
+
+const commandHooks = {
+  beforeBundling: () => [],
+  afterBundling(inputDir: string, outputDir: string): string[] {
+    return [`printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`];
+  },
+  beforeInstall: () => [],
+};
 
 export class CdkDayStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -42,19 +50,12 @@ export class CdkDayStack extends cdk.Stack {
         runtime: Runtime.NODEJS_14_X,
         entry: "packages/put-translation/src/app.ts",
         handler: "handler",
+        tracing: Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
           },
-          commandHooks: {
-            beforeBundling: () => [],
-            afterBundling(inputDir: string, outputDir: string): string[] {
-              return [
-                `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
-              ];
-            },
-            beforeInstall: () => [],
-          },
+          commandHooks,
         },
         environment: {
           TRANSLATE_BUS: translateBus.eventBusName,
@@ -85,19 +86,12 @@ export class CdkDayStack extends cdk.Stack {
         runtime: Runtime.NODEJS_14_X,
         entry: "packages/get-translation/src/app.ts",
         handler: "handler",
+        tracing: Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
           },
-          commandHooks: {
-            beforeBundling: () => [],
-            afterBundling(inputDir: string, outputDir: string): string[] {
-              return [
-                `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
-              ];
-            },
-            beforeInstall: () => [],
-          },
+          commandHooks,
         },
         environment: {
           TRANSLATE_TABLE: translateTable.tableName,
@@ -117,19 +111,12 @@ export class CdkDayStack extends cdk.Stack {
         runtime: Runtime.NODEJS_14_X,
         entry: "packages/save-translation/src/app.ts",
         handler: "handler",
+        tracing: Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
           },
-          commandHooks: {
-            beforeBundling: () => [],
-            afterBundling(inputDir: string, outputDir: string): string[] {
-              return [
-                `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
-              ];
-            },
-            beforeInstall: () => [],
-          },
+          commandHooks,
         },
         environment: {
           TRANSLATE_TABLE: translateTable.tableName,
