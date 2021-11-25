@@ -5,6 +5,6 @@
     },
     "packages": [
         "app/*",
-        "pipeline/*"
+        "pipeline"
     ]
 }
