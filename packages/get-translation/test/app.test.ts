@@ -3,7 +3,7 @@
 
 import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDB, ScanCommand } from "@aws-sdk/client-dynamodb";
-import { handler } from "./app";
+import { handler } from "../src/app";
 import { APIGatewayEvent } from "aws-lambda";
 
 const dynamoMock = mockClient(DynamoDB);
