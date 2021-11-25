@@ -10,3 +10,4 @@ cdk.out
 .aws-sam
 response.json
 locals.json
+packaged.yaml

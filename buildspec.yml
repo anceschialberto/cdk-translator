@@ -2,14 +2,14 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 12
+      nodejs: 14
     commands:
       # Install packages or any pre-reqs in this phase.
       # Upgrading SAM CLI to latest version
       - pip3 install --upgrade aws-sam-cli
       - sam --version
       # Installing project dependencies
-      - cd hello-world
+      - npm run setup
       - npm install
   
   pre_build:
@@ -20,7 +20,6 @@ phases:
   build:
     commands:
       # Use Build phase to build your artifacts (compile, etc.)
-      - cd ..
       - sam build
 
   post_build:
