@@ -1,0 +1,11 @@
+{
+    "CdkDayStack/PutTranslationFunction": {
+        "TRANSLATE_BUS": "XXXXXXXXXXXXX"
+    },
+    "CdkDayStack/GetTranslationFunction": {
+        "TRANSLATE_TABLE": "XXXXXXXXXXXXX"
+    },
+    "CdkDayStack/SaveTranslationFunction": {
+        "TRANSLATE_TABLE": "XXXXXXXXXXXXX"
+    }
+}
