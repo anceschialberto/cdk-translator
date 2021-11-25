@@ -47,13 +47,13 @@ export class CdkDayStack extends cdk.Stack {
             NODE_ENV: "production",
           },
           commandHooks: {
-            beforeBundling(inputDir: string, outputDir: string): any {},
+            beforeBundling: () => [],
             afterBundling(inputDir: string, outputDir: string): string[] {
               return [
                 `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
               ];
             },
-            beforeInstall(inputDir: string, outputDir: string): any {},
+            beforeInstall: () => [],
           },
         },
         environment: {
@@ -90,13 +90,13 @@ export class CdkDayStack extends cdk.Stack {
             NODE_ENV: "production",
           },
           commandHooks: {
-            beforeBundling(inputDir: string, outputDir: string): any {},
+            beforeBundling: () => [],
             afterBundling(inputDir: string, outputDir: string): string[] {
               return [
                 `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
               ];
             },
-            beforeInstall(inputDir: string, outputDir: string): any {},
+            beforeInstall: () => [],
           },
         },
         environment: {
@@ -122,13 +122,13 @@ export class CdkDayStack extends cdk.Stack {
             NODE_ENV: "production",
           },
           commandHooks: {
-            beforeBundling(inputDir: string, outputDir: string): any {},
+            beforeBundling: () => [],
             afterBundling(inputDir: string, outputDir: string): string[] {
               return [
                 `printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`,
               ];
             },
-            beforeInstall(inputDir: string, outputDir: string): any {},
+            beforeInstall: () => [],
           },
         },
         environment: {
