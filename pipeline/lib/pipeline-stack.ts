@@ -40,7 +40,7 @@ export class PipelineStack extends cdk.Stack {
 
     // Declare a new CodeBuild project
     const buildProject = new codebuild.PipelineProject(this, "Build", {
-      environment: { buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_3 },
+      environment: { buildImage: codebuild.LinuxBuildImage.STANDARD_5_0 },
       environmentVariables: {
         PACKAGE_BUCKET: {
           value: artifactsBucket.bucketName,

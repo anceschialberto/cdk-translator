@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 12
+      nodejs: 14
     commands:
       # Install packages or any pre-reqs in this phase.
       # Upgrading SAM CLI to latest version
