@@ -61,10 +61,10 @@ export class PipelineStack extends cdk.Stack {
       actions: [buildAction],
     });
 
-    const CODEBUILD_BUILD_NUMBER = buildAction.variable(
-      "CODEBUILD_BUILD_NUMBER"
-    );
-    const changeSetName = `CdkDayStack-dev-${CODEBUILD_BUILD_NUMBER}-changeset`;
+    // const CODEBUILD_BUILD_NUMBER = buildAction.variable(
+    //   "CODEBUILD_BUILD_NUMBER"
+    // );
+    const changeSetName = `CdkDayStack-dev-changeset`;
 
     // Deploy stage
     pipeline.addStage({
@@ -74,7 +74,7 @@ export class PipelineStack extends cdk.Stack {
           actionName: "CreateChangeSet",
           templatePath: buildOutput.atPath("packaged.yaml"),
           stackName: "CdkDayStack",
-          adminPermissions: true,
+          adminPermissions: false,
           changeSetName,
           runOrder: 1,
         }),
