@@ -18,6 +18,11 @@ Object {
           "ComputeType": "BUILD_GENERAL1_SMALL",
           "EnvironmentVariables": Array [
             Object {
+              "Name": "BRANCH_NAME",
+              "Type": "PLAINTEXT",
+              "Value": "#{Source_GitHub_Source_NS.BranchName}",
+            },
+            Object {
               "Name": "PACKAGE_BUCKET",
               "Type": "PLAINTEXT",
               "Value": Object {
@@ -297,6 +302,7 @@ Object {
                   "Repo": "cdk-translator",
                 },
                 "Name": "GitHub_Source",
+                "Namespace": "Source_GitHub_Source_NS",
                 "OutputArtifacts": Array [
                   Object {
                     "Name": "Artifact_Source_GitHub_Source",
