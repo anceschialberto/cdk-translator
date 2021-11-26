@@ -19,21 +19,20 @@ export class PipelineStack extends cdk.Stack {
     // Declare source code as an artifact
     const sourceOutput = new codepipeline.Artifact();
 
+    const sourceAction = new codepipeline_actions.GitHubSourceAction({
+      actionName: "GitHub_Source",
+      owner: "anceschialberto",
+      repo: "cdk-translator",
+      branch: "main",
+      // https://docs.aws.amazon.com/cdk/api/latest/docs/aws-codepipeline-actions-readme.html#github
+      oauthToken: cdk.SecretValue.secretsManager("my-github-token"),
+      output: sourceOutput,
+    });
+
     // Add source stage to pipeline
     pipeline.addStage({
       stageName: "Source",
-      actions: [
-        new codepipeline_actions.GitHubSourceAction({
-          actionName: "GitHub_Source",
-          owner: "anceschialberto",
-          repo: "cdk-translator",
-          branch: "main",
-          // https://docs.aws.amazon.com/cdk/api/latest/docs/aws-codepipeline-actions-readme.html#github
-          oauthToken: cdk.SecretValue.secretsManager("my-github-token"),
-          output: sourceOutput,
-          variablesNamespace: "sourcevariables",
-        }),
-      ],
+      actions: [sourceAction],
     });
 
     // Declare build output as artifacts
@@ -49,19 +48,23 @@ export class PipelineStack extends cdk.Stack {
       },
     });
 
+    const buildAction = new codepipeline_actions.CodeBuildAction({
+      actionName: "Build",
+      project: buildProject,
+      input: sourceOutput,
+      outputs: [buildOutput],
+    });
+
     // Add the build stage to our pipeline
     pipeline.addStage({
       stageName: "Build",
-      actions: [
-        new codepipeline_actions.CodeBuildAction({
-          actionName: "Build",
-          project: buildProject,
-          input: sourceOutput,
-          outputs: [buildOutput],
-          variablesNamespace: "buildvariables",
-        }),
-      ],
+      actions: [buildAction],
     });
+
+    const CODEBUILD_BUILD_NUMBER = buildAction.variable(
+      "CODEBUILD_BUILD_NUMBER"
+    );
+    const changeSetName = `CdkDayStack-dev-${CODEBUILD_BUILD_NUMBER}-changeset`;
 
     // Deploy stage
     pipeline.addStage({
@@ -72,13 +75,13 @@ export class PipelineStack extends cdk.Stack {
           templatePath: buildOutput.atPath("packaged.yaml"),
           stackName: "CdkDayStack",
           adminPermissions: true,
-          changeSetName: "CdkDayStack-dev-changeset",
+          changeSetName,
           runOrder: 1,
         }),
         new codepipeline_actions.CloudFormationExecuteChangeSetAction({
           actionName: "Deploy",
           stackName: "CdkDayStack",
-          changeSetName: "CdkDayStack-dev-changeset",
+          changeSetName,
           runOrder: 2,
         }),
       ],

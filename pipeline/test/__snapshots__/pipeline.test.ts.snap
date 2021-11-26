@@ -327,6 +327,7 @@ Object {
                   },
                 ],
                 "Name": "Build",
+                "Namespace": "Build_Build_NS",
                 "OutputArtifacts": Array [
                   Object {
                     "Name": "Artifact_Build_Build",
@@ -355,7 +356,7 @@ Object {
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_REPLACE",
                   "Capabilities": "CAPABILITY_NAMED_IAM",
-                  "ChangeSetName": "CdkDayStack-dev-changeset",
+                  "ChangeSetName": "CdkDayStack-dev-#{Build_Build_NS.CODEBUILD_BUILD_NUMBER}-changeset",
                   "RoleArn": Object {
                     "Fn::GetAtt": Array [
                       "PipelineDevCreateChangeSetRoleFFC4CBBE",
@@ -388,7 +389,7 @@ Object {
                 },
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_EXECUTE",
-                  "ChangeSetName": "CdkDayStack-dev-changeset",
+                  "ChangeSetName": "CdkDayStack-dev-#{Build_Build_NS.CODEBUILD_BUILD_NUMBER}-changeset",
                   "StackName": "CdkDayStack",
                 },
                 "Name": "Deploy",
@@ -492,7 +493,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "CdkDayStack-dev-changeset",
+                  "cloudformation:ChangeSetName": "CdkDayStack-dev-#{Build_Build_NS.CODEBUILD_BUILD_NUMBER}-changeset",
                 },
               },
               "Effect": "Allow",
@@ -609,7 +610,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "CdkDayStack-dev-changeset",
+                  "cloudformation:ChangeSetName": "CdkDayStack-dev-#{Build_Build_NS.CODEBUILD_BUILD_NUMBER}-changeset",
                 },
               },
               "Effect": "Allow",
