@@ -31,6 +31,7 @@ export class PipelineStack extends cdk.Stack {
           // https://docs.aws.amazon.com/cdk/api/latest/docs/aws-codepipeline-actions-readme.html#github
           oauthToken: cdk.SecretValue.secretsManager("my-github-token"),
           output: sourceOutput,
+          variablesNamespace: "sourcevariables",
         }),
       ],
     });
@@ -57,6 +58,7 @@ export class PipelineStack extends cdk.Stack {
           project: buildProject,
           input: sourceOutput,
           outputs: [buildOutput],
+          variablesNamespace: "buildvariables",
         }),
       ],
     });
