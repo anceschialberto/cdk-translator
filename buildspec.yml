@@ -10,9 +10,10 @@ phases:
       - unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
       - ./sam-installation/install
       - sam-beta-cdk --version
+      # npm workspaces support
+      - npm install -g npm@8
       # Installing project dependencies
       - npm install
-      - npm run setup
   
   pre_build:
     commands:
