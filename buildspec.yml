@@ -6,8 +6,8 @@ phases:
     commands:
       # Install packages or any pre-reqs in this phase.
       # SAM CLI beta version
-      - wget https://github.com/aws/aws-sam-cli/archive/refs/tags/v1.29.0.dev202108311500.zip
-      - unzip v1.29.0.dev202108311500.zip -d sam-installation
+      - wget https://github.com/aws/aws-sam-cli/releases/download/sam-cli-beta-cdk/aws-sam-cli-linux-x86_64.zip
+      - unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
       - ./sam-installation/install
       - sam-beta-cdk --version
       # Installing project dependencies
