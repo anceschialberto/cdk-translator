@@ -8,8 +8,8 @@ phases:
       # SAM CLI beta version
       - wget https://github.com/aws/aws-sam-cli/archive/refs/tags/v1.29.0.dev202108311500.zip
       - unzip v1.29.0.dev202108311500.zip -d sam-installation
-      - sudo ./sam-installation/install
-      - sam --version
+      - ./sam-installation/install
+      - sam-beta-cdk --version
       # Installing project dependencies
       - npm install
       - npm run setup
@@ -22,12 +22,12 @@ phases:
   build:
     commands:
       # Use Build phase to build your artifacts (compile, etc.)
-      - sam build
+      - sam-beta-cdk build
 
   post_build:
     commands:
       # Use Post-Build for notifications, git tags, upload artifacts to S3
-      - sam package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
+      - sam-beta-cdk package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
 
 artifacts:
   discard-paths: yes
