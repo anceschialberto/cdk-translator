@@ -1,6 +1,5 @@
 version: 0.2
 env:
-  git-credential-helper: yes
   exported-variables:
     - TAG
 phases:
@@ -33,9 +32,9 @@ phases:
     commands:
       # Use Post-Build for notifications, git tags, upload artifacts to S3
       - sam-beta-cdk package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
-      - export TAG="${BRANCH_NAME}.${CODEBUILD_BUILD_NUMBER}"
-      - git tag $TAG
-      - git push origin --tags
+      - VERSION=$(node -p -e "require('./package.json').version")
+      - export TAG="v${VERSION}-${CODEBUILD_BUILD_NUMBER}"
+      # - TODO tag github repo
 
 artifacts:
   discard-paths: yes

@@ -42,9 +42,9 @@ export class PipelineStack extends cdk.Stack {
     const buildProject = new codebuild.PipelineProject(this, "Build", {
       environment: { buildImage: codebuild.LinuxBuildImage.STANDARD_5_0 },
       environmentVariables: {
-        BRANCH_NAME: {
-          value: sourceAction.variables.branchName,
-        },
+        // BRANCH_NAME: {
+        //   value: sourceAction.variables.branchName,
+        // },
         PACKAGE_BUCKET: {
           value: artifactsBucket.bucketName,
         },
