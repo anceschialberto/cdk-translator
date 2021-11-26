@@ -42,6 +42,9 @@ export class PipelineStack extends cdk.Stack {
     const buildProject = new codebuild.PipelineProject(this, "Build", {
       environment: { buildImage: codebuild.LinuxBuildImage.STANDARD_5_0 },
       environmentVariables: {
+        BRANCH_NAME: {
+          value: sourceAction.variables.branchName,
+        },
         PACKAGE_BUCKET: {
           value: artifactsBucket.bucketName,
         },
@@ -64,7 +67,7 @@ export class PipelineStack extends cdk.Stack {
     // const CODEBUILD_BUILD_NUMBER = buildAction.variable(
     //   "CODEBUILD_BUILD_NUMBER"
     // );
-    const changeSetName = `CdkDayStack-dev-changeset`;
+    const changeSetName = "CdkDayStack-dev-changeset";
 
     // Deploy stage
     pipeline.addStage({
@@ -74,7 +77,7 @@ export class PipelineStack extends cdk.Stack {
           actionName: "CreateChangeSet",
           templatePath: buildOutput.atPath("packaged.yaml"),
           stackName: "CdkDayStack",
-          adminPermissions: false,
+          adminPermissions: true,
           changeSetName,
           runOrder: 1,
         }),

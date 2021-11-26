@@ -1,8 +1,7 @@
 version: 0.2
 env:
   exported-variables:
-    - CODEBUILD_BUILD_NUMBER
-    # - MY_VAR
+    - TAG
 phases:
   install:
     runtime-versions:
@@ -33,7 +32,9 @@ phases:
     commands:
       # Use Post-Build for notifications, git tags, upload artifacts to S3
       - sam-beta-cdk package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
-      # - export MY_VAR="some value"
+      - export TAG="${BRANCH_NAME}.${CODEBUILD_BUILD_NUMBER}"
+      - git tag $TAG
+      - git push origin --tags
 
 artifacts:
   discard-paths: yes
