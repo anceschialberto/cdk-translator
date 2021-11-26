@@ -28,7 +28,7 @@ phases:
   post_build:
     commands:
       # Use Post-Build for notifications, git tags, upload artifacts to S3
-      - sam-beta-cdk package --template-file .aws-sam/build/CdkDayStack.template.json --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
+      - sam-beta-cdk package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
 
 artifacts:
   discard-paths: yes
