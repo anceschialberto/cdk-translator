@@ -13,7 +13,7 @@ phases:
       # npm workspaces support
       - npm install -g npm@8
       # Installing project dependencies
-      - npm install
+      - npm ci
   
   pre_build:
     commands:
