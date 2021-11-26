@@ -44,7 +44,7 @@ export const handler = async function (event: APIGatewayEvent) {
     return {
       Items: response.Items?.map((item) => {
         const data = unmarshall(item);
-        delete data.language;
+        // delete data.language;
         return data;
       }),
     };
