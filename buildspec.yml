@@ -35,7 +35,7 @@ phases:
       - sam-beta-cdk package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
       - VERSION=$(node -p -e "require('./package.json').version")
       - export TAG="v${VERSION}-${CODEBUILD_BUILD_NUMBER}"
-      # - TODO tag github repo
+      - git push origin $TAG
 
 artifacts:
   discard-paths: yes
