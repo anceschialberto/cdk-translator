@@ -187,6 +187,16 @@ Object {
                 },
               ],
             },
+            Object {
+              "Action": "codestar-connections:UseConnection",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "GitHubConnection",
+                  "ConnectionArn",
+                ],
+              },
+            },
           ],
           "Version": "2012-10-17",
         },
@@ -198,6 +208,13 @@ Object {
         ],
       },
       "Type": "AWS::IAM::Policy",
+    },
+    "GitHubConnection": Object {
+      "Properties": Object {
+        "ConnectionName": "github-connection",
+        "ProviderType": "GitHub",
+      },
+      "Type": "AWS::CodeStarConnections::Connection",
     },
     "PipelineBuildCodePipelineActionRoleD77A08E6": Object {
       "Properties": Object {
@@ -285,23 +302,33 @@ Object {
               Object {
                 "ActionTypeId": Object {
                   "Category": "Source",
-                  "Owner": "ThirdParty",
-                  "Provider": "GitHub",
+                  "Owner": "AWS",
+                  "Provider": "CodeStarSourceConnection",
                   "Version": "1",
                 },
                 "Configuration": Object {
-                  "Branch": "main",
-                  "OAuthToken": "{{resolve:secretsmanager:my-github-token:SecretString:::}}",
-                  "Owner": "anceschialberto",
-                  "PollForSourceChanges": false,
-                  "Repo": "cdk-translator",
+                  "BranchName": "main",
+                  "ConnectionArn": Object {
+                    "Fn::GetAtt": Array [
+                      "GitHubConnection",
+                      "ConnectionArn",
+                    ],
+                  },
+                  "FullRepositoryId": "anceschialberto/cdk-translator",
+                  "OutputArtifactFormat": "CODEBUILD_CLONE_REF",
                 },
-                "Name": "GitHub_Source",
+                "Name": "Source",
                 "OutputArtifacts": Array [
                   Object {
-                    "Name": "Artifact_Source_GitHub_Source",
+                    "Name": "Artifact_Source_Source",
                   },
                 ],
+                "RoleArn": Object {
+                  "Fn::GetAtt": Array [
+                    "PipelineSourceCodePipelineActionRoleC6F9E7F5",
+                    "Arn",
+                  ],
+                },
                 "RunOrder": 1,
               },
             ],
@@ -323,7 +350,7 @@ Object {
                 },
                 "InputArtifacts": Array [
                   Object {
-                    "Name": "Artifact_Source_GitHub_Source",
+                    "Name": "Artifact_Source_Source",
                   },
                 ],
                 "Name": "Build",
@@ -355,14 +382,14 @@ Object {
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_REPLACE",
                   "Capabilities": "CAPABILITY_NAMED_IAM",
-                  "ChangeSetName": "CdkDayStack-dev-changeset",
+                  "ChangeSetName": "cdk-translator-change-set-main",
                   "RoleArn": Object {
                     "Fn::GetAtt": Array [
-                      "PipelineDevCreateChangeSetRoleFFC4CBBE",
+                      "PipelineDeployToDevCreateChangeSetRole10A0A2D1",
                       "Arn",
                     ],
                   },
-                  "StackName": "CdkDayStack",
+                  "StackName": "cdk-translator-dev",
                   "TemplatePath": "Artifact_Build_Build::packaged.yaml",
                 },
                 "InputArtifacts": Array [
@@ -373,7 +400,7 @@ Object {
                 "Name": "CreateChangeSet",
                 "RoleArn": Object {
                   "Fn::GetAtt": Array [
-                    "PipelineDevCreateChangeSetCodePipelineActionRole5BF56050",
+                    "PipelineDeployToDevCreateChangeSetCodePipelineActionRoleE8EE591B",
                     "Arn",
                   ],
                 },
@@ -388,58 +415,26 @@ Object {
                 },
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_EXECUTE",
-                  "ChangeSetName": "CdkDayStack-dev-changeset",
-                  "StackName": "CdkDayStack",
+                  "ChangeSetName": "cdk-translator-change-set-main",
+                  "StackName": "cdk-translator-dev",
                 },
                 "Name": "Deploy",
                 "RoleArn": Object {
                   "Fn::GetAtt": Array [
-                    "PipelineDevDeployCodePipelineActionRoleF791317A",
+                    "PipelineDeployToDevDeployCodePipelineActionRole4E775F74",
                     "Arn",
                   ],
                 },
                 "RunOrder": 2,
               },
             ],
-            "Name": "Dev",
+            "Name": "DeployToDev",
           },
         ],
       },
       "Type": "AWS::CodePipeline::Pipeline",
     },
-    "PipelineDevCreateChangeSetCodePipelineActionRole5BF56050": Object {
-      "Properties": Object {
-        "AssumeRolePolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": Object {
-                "AWS": Object {
-                  "Fn::Join": Array [
-                    "",
-                    Array [
-                      "arn:",
-                      Object {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::",
-                      Object {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":root",
-                    ],
-                  ],
-                },
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "PipelineDevCreateChangeSetCodePipelineActionRoleDefaultPolicy560ECE93": Object {
+    "PipelineDeployToDevCreateChangeSetCodePipelineActionRoleDefaultPolicyC192AE7F": Object {
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
@@ -448,7 +443,7 @@ Object {
               "Effect": "Allow",
               "Resource": Object {
                 "Fn::GetAtt": Array [
-                  "PipelineDevCreateChangeSetRoleFFC4CBBE",
+                  "PipelineDeployToDevCreateChangeSetRole10A0A2D1",
                   "Arn",
                 ],
               },
@@ -492,7 +487,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "CdkDayStack-dev-changeset",
+                  "cloudformation:ChangeSetName": "cdk-translator-change-set-main",
                 },
               },
               "Effect": "Allow",
@@ -512,7 +507,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":stack/CdkDayStack/*",
+                    ":stack/cdk-translator-dev/*",
                   ],
                 ],
               },
@@ -520,16 +515,65 @@ Object {
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "PipelineDevCreateChangeSetCodePipelineActionRoleDefaultPolicy560ECE93",
+        "PolicyName": "PipelineDeployToDevCreateChangeSetCodePipelineActionRoleDefaultPolicyC192AE7F",
         "Roles": Array [
           Object {
-            "Ref": "PipelineDevCreateChangeSetCodePipelineActionRole5BF56050",
+            "Ref": "PipelineDeployToDevCreateChangeSetCodePipelineActionRoleE8EE591B",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "PipelineDevCreateChangeSetRoleDefaultPolicy9C56B345": Object {
+    "PipelineDeployToDevCreateChangeSetCodePipelineActionRoleE8EE591B": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "PipelineDeployToDevCreateChangeSetRole10A0A2D1": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "cloudformation.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "PipelineDeployToDevCreateChangeSetRoleDefaultPolicyAA15D1F8": Object {
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
@@ -571,82 +615,16 @@ Object {
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "PipelineDevCreateChangeSetRoleDefaultPolicy9C56B345",
+        "PolicyName": "PipelineDeployToDevCreateChangeSetRoleDefaultPolicyAA15D1F8",
         "Roles": Array [
           Object {
-            "Ref": "PipelineDevCreateChangeSetRoleFFC4CBBE",
+            "Ref": "PipelineDeployToDevCreateChangeSetRole10A0A2D1",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "PipelineDevCreateChangeSetRoleFFC4CBBE": Object {
-      "Properties": Object {
-        "AssumeRolePolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": Object {
-                "Service": "cloudformation.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "PipelineDevDeployCodePipelineActionRoleDefaultPolicy0025FF20": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": Array [
-                "cloudformation:DescribeChangeSet",
-                "cloudformation:DescribeStacks",
-                "cloudformation:ExecuteChangeSet",
-              ],
-              "Condition": Object {
-                "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "CdkDayStack-dev-changeset",
-                },
-              },
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::Join": Array [
-                  "",
-                  Array [
-                    "arn:",
-                    Object {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":cloudformation:",
-                    Object {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    Object {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":stack/CdkDayStack/*",
-                  ],
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "PipelineDevDeployCodePipelineActionRoleDefaultPolicy0025FF20",
-        "Roles": Array [
-          Object {
-            "Ref": "PipelineDevDeployCodePipelineActionRoleF791317A",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "PipelineDevDeployCodePipelineActionRoleF791317A": Object {
+    "PipelineDeployToDevDeployCodePipelineActionRole4E775F74": Object {
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -677,6 +655,55 @@ Object {
         },
       },
       "Type": "AWS::IAM::Role",
+    },
+    "PipelineDeployToDevDeployCodePipelineActionRoleDefaultPolicyF5988D54": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "cloudformation:DescribeChangeSet",
+                "cloudformation:DescribeStacks",
+                "cloudformation:ExecuteChangeSet",
+              ],
+              "Condition": Object {
+                "StringEqualsIfExists": Object {
+                  "cloudformation:ChangeSetName": "cdk-translator-change-set-main",
+                },
+              },
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":cloudformation:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":stack/cdk-translator-dev/*",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "PipelineDeployToDevDeployCodePipelineActionRoleDefaultPolicyF5988D54",
+        "Roles": Array [
+          Object {
+            "Ref": "PipelineDeployToDevDeployCodePipelineActionRole4E775F74",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "PipelineRoleD68726F7": Object {
       "Properties": Object {
@@ -737,6 +764,16 @@ Object {
               "Effect": "Allow",
               "Resource": Object {
                 "Fn::GetAtt": Array [
+                  "PipelineSourceCodePipelineActionRoleC6F9E7F5",
+                  "Arn",
+                ],
+              },
+            },
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
                   "PipelineBuildCodePipelineActionRoleD77A08E6",
                   "Arn",
                 ],
@@ -747,7 +784,7 @@ Object {
               "Effect": "Allow",
               "Resource": Object {
                 "Fn::GetAtt": Array [
-                  "PipelineDevCreateChangeSetCodePipelineActionRole5BF56050",
+                  "PipelineDeployToDevCreateChangeSetCodePipelineActionRoleE8EE591B",
                   "Arn",
                 ],
               },
@@ -757,7 +794,7 @@ Object {
               "Effect": "Allow",
               "Resource": Object {
                 "Fn::GetAtt": Array [
-                  "PipelineDevDeployCodePipelineActionRoleF791317A",
+                  "PipelineDeployToDevDeployCodePipelineActionRole4E775F74",
                   "Arn",
                 ],
               },
@@ -774,26 +811,140 @@ Object {
       },
       "Type": "AWS::IAM::Policy",
     },
-    "PipelineSourceGitHubSourceWebhookResource8EECEFFF": Object {
+    "PipelineSourceCodePipelineActionRoleC6F9E7F5": Object {
       "Properties": Object {
-        "Authentication": "GITHUB_HMAC",
-        "AuthenticationConfiguration": Object {
-          "SecretToken": "{{resolve:secretsmanager:my-github-token:SecretString:::}}",
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
         },
-        "Filters": Array [
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "PipelineSourceCodePipelineActionRoleDefaultPolicy2D565925": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "codestar-connections:UseConnection",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "GitHubConnection",
+                  "ConnectionArn",
+                ],
+              },
+            },
+            Object {
+              "Action": Array [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject*",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ArtifactsBucket2AAC5544",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ArtifactsBucket2AAC5544",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            Object {
+              "Action": "s3:PutObjectAcl",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "ArtifactsBucket2AAC5544",
+                        "Arn",
+                      ],
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "PipelineSourceCodePipelineActionRoleDefaultPolicy2D565925",
+        "Roles": Array [
           Object {
-            "JsonPath": "$.ref",
-            "MatchEquals": "refs/heads/{Branch}",
+            "Ref": "PipelineSourceCodePipelineActionRoleC6F9E7F5",
           },
         ],
-        "RegisterWithThirdParty": true,
-        "TargetAction": "GitHub_Source",
-        "TargetPipeline": Object {
-          "Ref": "PipelineC660917D",
-        },
-        "TargetPipelineVersion": 1,
       },
-      "Type": "AWS::CodePipeline::Webhook",
+      "Type": "AWS::IAM::Policy",
+    },
+    "UseCodeStarConnectionPolicy72C97B62": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "codestar-connections:UseConnection",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "GitHubConnection",
+                  "ConnectionArn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "UseCodeStarConnectionPolicy72C97B62",
+        "Roles": Array [
+          Object {
+            "Ref": "BuildRoleB7C66CB2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
   },
 }
