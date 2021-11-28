@@ -43,14 +43,16 @@ export class PipelineStack extends cdk.Stack {
     //   output: sourceOutput,
     // });
 
+    // https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
     const sourceAction =
       new codepipeline_actions.CodeStarConnectionsSourceAction({
         actionName: "Source",
+        connectionArn: codeStarConnection.attrConnectionArn,
         owner: "anceschialberto",
         repo: this.APP_NAME,
         branch: "main",
+        triggerOnPush: false,
         codeBuildCloneOutput: true,
-        connectionArn: codeStarConnection.attrConnectionArn,
         output: sourceOutput,
       });
 

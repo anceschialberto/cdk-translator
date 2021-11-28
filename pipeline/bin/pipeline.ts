@@ -2,8 +2,10 @@
 import "source-map-support/register";
 import * as cdk from "@aws-cdk/core";
 import { PipelineStack } from "../lib/pipeline-stack";
+import { WebhookStack } from "../lib/webhook-stack";
 
 const app = new cdk.App();
+new WebhookStack(app, "CdkDayStack-webhook", {});
 new PipelineStack(app, "CdkDayStack-cicd", {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,

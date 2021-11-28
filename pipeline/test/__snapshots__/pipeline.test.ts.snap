@@ -314,6 +314,7 @@ Object {
                       "ConnectionArn",
                     ],
                   },
+                  "DetectChanges": false,
                   "FullRepositoryId": "anceschialberto/cdk-translator",
                   "OutputArtifactFormat": "CODEBUILD_CLONE_REF",
                 },
