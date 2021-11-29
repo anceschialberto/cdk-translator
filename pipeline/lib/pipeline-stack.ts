@@ -108,8 +108,7 @@ export class PipelineStack extends cdk.Stack {
 
     const stackName = this.isDefaultChannel()
       ? "cdk-translator-dev"
-      : // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `cdk-translator-dev-${this.branchName}`;
+      : `cdk-translator-dev-${this.branchName}`;
 
     const changeSetName = `cdk-translator-change-set-${this.branchName}`;
 
