@@ -13,9 +13,12 @@ phases:
       - wget https://github.com/aws/aws-sam-cli/releases/download/sam-cli-beta-cdk/aws-sam-cli-linux-x86_64.zip
       - unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
       - ./sam-installation/install
+      - rm -rf aws-sam-cli-linux-x86_64.zip sam-installation
       - sam-beta-cdk --version
       # npm workspaces support
       - npm install -g npm@8
+      # Checkout commit
+      - git checkout $COMMIT_ID
       # Installing project dependencies
       - npm ci
   
@@ -33,9 +36,10 @@ phases:
     commands:
       # Use Post-Build for notifications, git tags, upload artifacts to S3
       - sam-beta-cdk package --s3-bucket $PACKAGE_BUCKET --output-template-file packaged.yaml
+      # Tag commit
       - VERSION=$(node -p -e "require('./package.json').version")
       - export TAG="v${VERSION}-${CODEBUILD_BUILD_NUMBER}"
-      - git push origin $TAG
+      - git tag $TAG && git push origin --tags
 
 artifacts:
   discard-paths: yes

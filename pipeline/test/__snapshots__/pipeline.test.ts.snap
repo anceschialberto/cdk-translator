@@ -18,6 +18,11 @@ Object {
           "ComputeType": "BUILD_GENERAL1_SMALL",
           "EnvironmentVariables": Array [
             Object {
+              "Name": "COMMIT_ID",
+              "Type": "PLAINTEXT",
+              "Value": "#{SourceVariables.CommitId}",
+            },
+            Object {
               "Name": "PACKAGE_BUCKET",
               "Type": "PLAINTEXT",
               "Value": Object {
@@ -319,6 +324,7 @@ Object {
                   "OutputArtifactFormat": "CODEBUILD_CLONE_REF",
                 },
                 "Name": "Source",
+                "Namespace": "SourceVariables",
                 "OutputArtifacts": Array [
                   Object {
                     "Name": "Artifact_Source_Source",
@@ -383,14 +389,14 @@ Object {
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_REPLACE",
                   "Capabilities": "CAPABILITY_NAMED_IAM",
-                  "ChangeSetName": "cdk-translator-change-set-main",
+                  "ChangeSetName": "cdk-translator-change-set-#{SourceVariables.BranchName}",
                   "RoleArn": Object {
                     "Fn::GetAtt": Array [
                       "PipelineDeployToDevCreateChangeSetRole10A0A2D1",
                       "Arn",
                     ],
                   },
-                  "StackName": "cdk-translator-dev",
+                  "StackName": "cdk-translator-dev-#{SourceVariables.BranchName}",
                   "TemplatePath": "Artifact_Build_Build::packaged.yaml",
                 },
                 "InputArtifacts": Array [
@@ -416,8 +422,8 @@ Object {
                 },
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_EXECUTE",
-                  "ChangeSetName": "cdk-translator-change-set-main",
-                  "StackName": "cdk-translator-dev",
+                  "ChangeSetName": "cdk-translator-change-set-#{SourceVariables.BranchName}",
+                  "StackName": "cdk-translator-dev-#{SourceVariables.BranchName}",
                 },
                 "Name": "Deploy",
                 "RoleArn": Object {
@@ -488,7 +494,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "cdk-translator-change-set-main",
+                  "cloudformation:ChangeSetName": "cdk-translator-change-set-#{SourceVariables.BranchName}",
                 },
               },
               "Effect": "Allow",
@@ -508,7 +514,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":stack/cdk-translator-dev/*",
+                    ":stack/cdk-translator-dev-#{SourceVariables.BranchName}/*",
                   ],
                 ],
               },
@@ -669,7 +675,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "cdk-translator-change-set-main",
+                  "cloudformation:ChangeSetName": "cdk-translator-change-set-#{SourceVariables.BranchName}",
                 },
               },
               "Effect": "Allow",
@@ -689,7 +695,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":stack/cdk-translator-dev/*",
+                    ":stack/cdk-translator-dev-#{SourceVariables.BranchName}/*",
                   ],
                 ],
               },

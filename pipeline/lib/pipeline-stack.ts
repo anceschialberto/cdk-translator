@@ -9,6 +9,7 @@ import { Effect, Policy, PolicyStatement } from "@aws-cdk/aws-iam";
 export class PipelineStack extends cdk.Stack {
   pipelineArn: string;
   pipelineName: string;
+  branchName = "main";
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -16,7 +17,7 @@ export class PipelineStack extends cdk.Stack {
     // The code that defines your stack goes here
     const artifactsBucket = new s3.Bucket(this, "ArtifactsBucket");
 
-    const codeStarConnection = new codestarconnections.CfnConnection(
+    const githubConnection = new codestarconnections.CfnConnection(
       this,
       "GitHubConnection",
       {
@@ -51,23 +52,24 @@ export class PipelineStack extends cdk.Stack {
     const sourceAction =
       new codepipeline_actions.CodeStarConnectionsSourceAction({
         actionName: "Source",
-        connectionArn: codeStarConnection.attrConnectionArn,
+        connectionArn: githubConnection.attrConnectionArn,
         owner: "anceschialberto",
         repo: "cdk-translator",
-        branch: "main",
+        branch: this.branchName,
         triggerOnPush: false,
         codeBuildCloneOutput: true,
+        variablesNamespace: "SourceVariables",
         output: sourceOutput,
       });
+
+    // https://github.com/aws/aws-cdk/issues/10632#issuecomment-925186079
+    this.branchName = "#{SourceVariables.BranchName}";
 
     // Add source stage to pipeline
     pipeline.addStage({
       stageName: "Source",
       actions: [sourceAction],
     });
-
-    const branchName = "main";
-    const isDefaultChannel = branchName === "main";
 
     // Declare build output as artifacts
     const buildOutput = new codepipeline.Artifact();
@@ -76,6 +78,9 @@ export class PipelineStack extends cdk.Stack {
     const buildProject = new codebuild.PipelineProject(this, "Build", {
       environment: { buildImage: codebuild.LinuxBuildImage.STANDARD_5_0 },
       environmentVariables: {
+        COMMIT_ID: {
+          value: "#{SourceVariables.CommitId}",
+        },
         PACKAGE_BUCKET: {
           value: artifactsBucket.bucketName,
         },
@@ -85,7 +90,7 @@ export class PipelineStack extends cdk.Stack {
     const useCodeStarConnectionPolicyStatement = new PolicyStatement({
       effect: Effect.ALLOW,
       actions: ["codestar-connections:UseConnection"],
-      resources: [codeStarConnection.attrConnectionArn],
+      resources: [githubConnection.attrConnectionArn],
     });
 
     buildProject.role?.attachInlinePolicy(
@@ -107,12 +112,12 @@ export class PipelineStack extends cdk.Stack {
       actions: [buildAction],
     });
 
-    const stackName = isDefaultChannel
+    const stackName = this.isDefaultChannel()
       ? "cdk-translator-dev"
       : // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `cdk-translator-dev-${branchName}`;
+        `cdk-translator-dev-${this.branchName}`;
 
-    const changeSetName = `cdk-translator-change-set-${branchName}`;
+    const changeSetName = `cdk-translator-change-set-${this.branchName}`;
 
     // Deploy stage
     pipeline.addStage({
@@ -135,4 +140,6 @@ export class PipelineStack extends cdk.Stack {
       ],
     });
   }
+
+  isDefaultChannel = () => this.branchName === "main";
 }
