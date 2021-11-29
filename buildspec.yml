@@ -3,6 +3,7 @@ env:
   git-credential-helper: yes
   exported-variables:
     - TAG
+    - BRANCH_NAME
 phases:
   install:
     runtime-versions:
@@ -18,7 +19,7 @@ phases:
       # npm workspaces support
       - npm install -g npm@8
       # Checkout commit
-      - git checkout ${COMMIT_ID}
+      - git checkout $COMMIT_ID
       # Installing project dependencies
       - npm ci
   
@@ -40,6 +41,8 @@ phases:
       - VERSION=$(node -p -e "require('./package.json').version")
       - export TAG="v${VERSION}-${CODEBUILD_BUILD_NUMBER}"
       - git tag $TAG && git push origin --tags
+      # Export branch name
+      - export BRANCH_NAME="${BRANCH_NAME}"
 
 artifacts:
   discard-paths: yes

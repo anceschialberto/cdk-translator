@@ -37,17 +37,6 @@ export class PipelineStack extends cdk.Stack {
     // Declare source code as an artifact
     const sourceOutput = new codepipeline.Artifact();
 
-    // Deprecated GitHub source action (version 1)
-    // const sourceAction = new codepipeline_actions.GitHubSourceAction({
-    //   actionName: "GitHub_Source",
-    //   owner: "anceschialberto",
-    //   repo: "cdk-translator",
-    //   branch: "main",
-    //   // https://docs.aws.amazon.com/cdk/api/latest/docs/aws-codepipeline-actions-readme.html#github
-    //   oauthToken: cdk.SecretValue.secretsManager("my-github-token"),
-    //   output: sourceOutput,
-    // });
-
     // https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
     const sourceAction =
       new codepipeline_actions.CodeStarConnectionsSourceAction({
@@ -62,9 +51,6 @@ export class PipelineStack extends cdk.Stack {
         output: sourceOutput,
       });
 
-    // https://github.com/aws/aws-cdk/issues/10632#issuecomment-925186079
-    this.branchName = "#{SourceVariables.BranchName}";
-
     // Add source stage to pipeline
     pipeline.addStage({
       stageName: "Source",
@@ -78,9 +64,6 @@ export class PipelineStack extends cdk.Stack {
     const buildProject = new codebuild.PipelineProject(this, "Build", {
       environment: { buildImage: codebuild.LinuxBuildImage.STANDARD_5_0 },
       environmentVariables: {
-        COMMIT_ID: {
-          value: "#{SourceVariables.CommitId}",
-        },
         PACKAGE_BUCKET: {
           value: artifactsBucket.bucketName,
         },
@@ -101,10 +84,21 @@ export class PipelineStack extends cdk.Stack {
 
     const buildAction = new codepipeline_actions.CodeBuildAction({
       actionName: "Build",
-      project: buildProject,
       input: sourceOutput,
+      project: buildProject,
+      environmentVariables: {
+        COMMIT_ID: {
+          value: "#{SourceVariables.CommitId}",
+        },
+        BRANCH_NAME: {
+          value: "#{SourceVariables.BranchName}",
+        },
+      },
       outputs: [buildOutput],
     });
+
+    // https://github.com/aws/aws-cdk/issues/10632#issuecomment-925186079
+    this.branchName = buildAction.variable("BRANCH_NAME");
 
     // Add the build stage to our pipeline
     pipeline.addStage({
