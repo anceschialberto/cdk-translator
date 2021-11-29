@@ -7,7 +7,8 @@ import codebuild = require("@aws-cdk/aws-codebuild");
 import { Effect, Policy, PolicyStatement } from "@aws-cdk/aws-iam";
 
 export class PipelineStack extends cdk.Stack {
-  APP_NAME = "cdk-translator";
+  pipelineArn: string;
+  pipelineName: string;
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -29,6 +30,9 @@ export class PipelineStack extends cdk.Stack {
       artifactBucket: artifactsBucket,
     });
 
+    this.pipelineArn = pipeline.pipelineArn;
+    this.pipelineName = pipeline.pipelineName;
+
     // Declare source code as an artifact
     const sourceOutput = new codepipeline.Artifact();
 
@@ -36,7 +40,7 @@ export class PipelineStack extends cdk.Stack {
     // const sourceAction = new codepipeline_actions.GitHubSourceAction({
     //   actionName: "GitHub_Source",
     //   owner: "anceschialberto",
-    //   repo: this.APP_NAME,
+    //   repo: "cdk-translator",
     //   branch: "main",
     //   // https://docs.aws.amazon.com/cdk/api/latest/docs/aws-codepipeline-actions-readme.html#github
     //   oauthToken: cdk.SecretValue.secretsManager("my-github-token"),
@@ -49,7 +53,7 @@ export class PipelineStack extends cdk.Stack {
         actionName: "Source",
         connectionArn: codeStarConnection.attrConnectionArn,
         owner: "anceschialberto",
-        repo: this.APP_NAME,
+        repo: "cdk-translator",
         branch: "main",
         triggerOnPush: false,
         codeBuildCloneOutput: true,
@@ -104,11 +108,11 @@ export class PipelineStack extends cdk.Stack {
     });
 
     const stackName = isDefaultChannel
-      ? `${this.APP_NAME}-dev`
+      ? "cdk-translator-dev"
       : // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `${this.APP_NAME}-dev-${branchName}`;
+        `cdk-translator-dev-${branchName}`;
 
-    const changeSetName = `${this.APP_NAME}-change-set-${branchName}`;
+    const changeSetName = `cdk-translator-change-set-${branchName}`;
 
     // Deploy stage
     pipeline.addStage({

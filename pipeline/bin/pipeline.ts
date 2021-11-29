@@ -5,8 +5,8 @@ import { PipelineStack } from "../lib/pipeline-stack";
 import { WebhookStack } from "../lib/webhook-stack";
 
 const app = new cdk.App();
-new WebhookStack(app, "CdkDayStack-webhook", {});
-new PipelineStack(app, "CdkDayStack-cicd", {
+
+const pipeline = new PipelineStack(app, "CdkDayStack-cicd", {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -17,4 +17,9 @@ new PipelineStack(app, "CdkDayStack-cicd", {
    * want to deploy the stack to. */
   // env: { account: '123456789012', region: 'us-east-1' },
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+});
+
+new WebhookStack(app, "CdkDayStack-webhook", {
+  pipelineArn: pipeline.pipelineArn,
+  pipelineName: pipeline.pipelineName,
 });
