@@ -18,7 +18,7 @@ phases:
       # npm workspaces support
       - npm install -g npm@8
       # Checkout commit
-      - git checkout $COMMIT_ID
+      - git checkout ${COMMIT_ID}
       # Installing project dependencies
       - npm ci
   
