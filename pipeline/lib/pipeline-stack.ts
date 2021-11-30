@@ -106,12 +106,6 @@ export class PipelineStack extends cdk.Stack {
       actions: [buildAction],
     });
 
-    const stackName = this.isDefaultChannel()
-      ? "cdk-translator-dev"
-      : `cdk-translator-dev-${this.branchName}`;
-
-    const changeSetName = `cdk-translator-change-set-${this.branchName}`;
-
     // Deploy stage
     pipeline.addStage({
       stageName: "DeployToDev",
@@ -119,20 +113,18 @@ export class PipelineStack extends cdk.Stack {
         new codepipeline_actions.CloudFormationCreateReplaceChangeSetAction({
           actionName: "CreateChangeSet",
           templatePath: buildOutput.atPath("packaged.yaml"),
-          stackName,
+          stackName: "cdk-translator-dev",
           adminPermissions: true,
-          changeSetName,
+          changeSetName: "cdk-translator-change-set",
           runOrder: 1,
         }),
         new codepipeline_actions.CloudFormationExecuteChangeSetAction({
           actionName: "Deploy",
-          stackName,
-          changeSetName,
+          stackName: "cdk-translator-dev",
+          changeSetName: "cdk-translator-change-set",
           runOrder: 2,
         }),
       ],
     });
   }
-
-  isDefaultChannel = () => this.branchName === "main";
 }
