@@ -386,14 +386,14 @@ Object {
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_REPLACE",
                   "Capabilities": "CAPABILITY_NAMED_IAM",
-                  "ChangeSetName": "cdk-translator-change-set-#{Build_Build_NS.BRANCH_NAME}",
+                  "ChangeSetName": "cdk-translator-change-set",
                   "RoleArn": Object {
                     "Fn::GetAtt": Array [
                       "PipelineDeployToDevCreateChangeSetRole10A0A2D1",
                       "Arn",
                     ],
                   },
-                  "StackName": "cdk-translator-dev-#{Build_Build_NS.BRANCH_NAME}",
+                  "StackName": "cdk-translator-dev",
                   "TemplatePath": "Artifact_Build_Build::packaged.yaml",
                 },
                 "InputArtifacts": Array [
@@ -419,8 +419,8 @@ Object {
                 },
                 "Configuration": Object {
                   "ActionMode": "CHANGE_SET_EXECUTE",
-                  "ChangeSetName": "cdk-translator-change-set-#{Build_Build_NS.BRANCH_NAME}",
-                  "StackName": "cdk-translator-dev-#{Build_Build_NS.BRANCH_NAME}",
+                  "ChangeSetName": "cdk-translator-change-set",
+                  "StackName": "cdk-translator-dev",
                 },
                 "Name": "Deploy",
                 "RoleArn": Object {
@@ -491,7 +491,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "cdk-translator-change-set-#{Build_Build_NS.BRANCH_NAME}",
+                  "cloudformation:ChangeSetName": "cdk-translator-change-set",
                 },
               },
               "Effect": "Allow",
@@ -511,7 +511,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":stack/cdk-translator-dev-#{Build_Build_NS.BRANCH_NAME}/*",
+                    ":stack/cdk-translator-dev/*",
                   ],
                 ],
               },
@@ -672,7 +672,7 @@ Object {
               ],
               "Condition": Object {
                 "StringEqualsIfExists": Object {
-                  "cloudformation:ChangeSetName": "cdk-translator-change-set-#{Build_Build_NS.BRANCH_NAME}",
+                  "cloudformation:ChangeSetName": "cdk-translator-change-set",
                 },
               },
               "Effect": "Allow",
@@ -692,7 +692,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":stack/cdk-translator-dev-#{Build_Build_NS.BRANCH_NAME}/*",
+                    ":stack/cdk-translator-dev/*",
                   ],
                 ],
               },
