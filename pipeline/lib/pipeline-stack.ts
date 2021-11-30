@@ -98,7 +98,7 @@ export class PipelineStack extends cdk.Stack {
     });
 
     // https://github.com/aws/aws-cdk/issues/10632#issuecomment-925186079
-    this.branchName = buildAction.variable("BRANCH_NAME");
+    // this.branchName = buildAction.variable("BRANCH_NAME");
 
     // Add the build stage to our pipeline
     pipeline.addStage({
@@ -113,15 +113,15 @@ export class PipelineStack extends cdk.Stack {
         new codepipeline_actions.CloudFormationCreateReplaceChangeSetAction({
           actionName: "CreateChangeSet",
           templatePath: buildOutput.atPath("packaged.yaml"),
-          stackName: "cdk-translator-dev",
+          stackName: "CdkDayStack-dev",
           adminPermissions: true,
-          changeSetName: "cdk-translator-change-set",
+          changeSetName: "CdkDayStack-change-set",
           runOrder: 1,
         }),
         new codepipeline_actions.CloudFormationExecuteChangeSetAction({
           actionName: "Deploy",
-          stackName: "cdk-translator-dev",
-          changeSetName: "cdk-translator-change-set",
+          stackName: "CdkDayStack-dev",
+          changeSetName: "CdkDayStack-change-set",
           runOrder: 2,
         }),
       ],
