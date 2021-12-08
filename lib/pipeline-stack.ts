@@ -10,6 +10,7 @@ import {
 } from "aws-cdk-lib/pipelines";
 
 import { CdkTranslatorStage } from "./cdk-translator-stage";
+import { BuildSpec } from "aws-cdk-lib/aws-codebuild";
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -32,8 +33,9 @@ export class PipelineStack extends Stack {
           "main",
           { connectionArn: githubConnection.attrConnectionArn }
         ),
-        commands: ["npm ci", "npx cdk synth"],
+        commands: ["npm i -g npm@8", "npm ci", "npx cdk synth"],
       }),
+      crossAccountKeys: true,
     });
 
     pipeline.addStage(
