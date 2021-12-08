@@ -1,20 +1,17 @@
 {
-  "name": "cdk-day",
+  "name": "cdk-translator",
   "version": "0.1.0",
   "license": "MIT-0",
   "bin": {
-    "cdk-day": "bin/cdk-day.ts"
+    "cdk-translator": "bin/cdk-translator.ts"
   },
   "workspaces": [
-    "./app/*",
-    "./pipeline",
-    "./pipeline/webhook"
+    "./app/*"
   ],
   "scripts": {
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
-    "cdk": "cdk",
-    "deploy": "cdk deploy -a .aws-sam/build --profile personal"
+    "cdk": "cdk"
   },
   "devDependencies": {
     "@aws-cdk/assert": "1.134.0",

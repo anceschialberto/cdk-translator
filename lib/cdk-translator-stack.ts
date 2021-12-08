@@ -21,7 +21,7 @@ const commandHooks = {
   beforeInstall: () => [],
 };
 
-export class CdkDayStack extends Stack {
+export class CdkTranslatorStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
