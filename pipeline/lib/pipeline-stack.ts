@@ -1,17 +1,19 @@
-import * as cdk from "@aws-cdk/core";
-import * as codestarconnections from "@aws-cdk/aws-codestarconnections";
-import s3 = require("@aws-cdk/aws-s3");
-import codepipeline = require("@aws-cdk/aws-codepipeline");
-import codepipeline_actions = require("@aws-cdk/aws-codepipeline-actions");
-import codebuild = require("@aws-cdk/aws-codebuild");
-import { Effect, Policy, PolicyStatement } from "@aws-cdk/aws-iam";
+import { Construct } from "constructs";
+import { Stack, StackProps } from "aws-cdk-lib"; // core constructs
 
-export class PipelineStack extends cdk.Stack {
+import { aws_s3 as s3 } from "aws-cdk-lib";
+import { aws_codestarconnections as codestarconnections } from "aws-cdk-lib";
+import { aws_codepipeline as codepipeline } from "aws-cdk-lib";
+import { aws_codepipeline_actions as codepipeline_actions } from "aws-cdk-lib";
+import { aws_codebuild as codebuild } from "aws-cdk-lib";
+import { aws_iam as iam } from "aws-cdk-lib";
+
+export class PipelineStack extends Stack {
   pipelineArn: string;
   pipelineName: string;
   branchName = "main";
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
@@ -70,14 +72,14 @@ export class PipelineStack extends cdk.Stack {
       },
     });
 
-    const useCodeStarConnectionPolicyStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
+    const useCodeStarConnectionPolicyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
       actions: ["codestar-connections:UseConnection"],
       resources: [githubConnection.attrConnectionArn],
     });
 
     buildProject.role?.attachInlinePolicy(
-      new Policy(this, "UseCodeStarConnectionPolicy", {
+      new iam.Policy(this, "UseCodeStarConnectionPolicy", {
         statements: [useCodeStarConnectionPolicyStatement],
       })
     );

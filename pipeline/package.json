@@ -23,13 +23,10 @@
     "typescript": "~4.5.2"
   },
   "dependencies": {
-    "@aws-cdk/aws-codebuild": "^1.134.0",
-    "@aws-cdk/aws-codecommit": "^1.134.0",
-    "@aws-cdk/aws-codedeploy": "^1.134.0",
-    "@aws-cdk/aws-codepipeline-actions": "^1.134.0",
-    "@aws-cdk/aws-s3": "^1.134.0",
-    "@aws-cdk/core": "1.134.0",
-    "@aws-sdk/client-codepipeline": "^3.42.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "2.1.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "2.1.0-alpha.0",
+    "aws-cdk-lib": "^2.1.0",
+    "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
   }
 }

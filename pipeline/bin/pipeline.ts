@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import "source-map-support/register";
-import * as cdk from "@aws-cdk/core";
+import { App } from "aws-cdk-lib"; // core constructs
+
 import { PipelineStack } from "../lib/pipeline-stack";
 import { WebhookStack } from "../lib/webhook-stack";
 
-const app = new cdk.App();
+const app = new App();
 
 const pipeline = new PipelineStack(app, "CdkDayStack-cicd", {
   /* If you don't specify 'env', this stack will be environment-agnostic.

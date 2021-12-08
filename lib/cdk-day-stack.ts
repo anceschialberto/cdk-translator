@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import * as cdk from "@aws-cdk/core";
-import { HttpApi, HttpMethod } from "@aws-cdk/aws-apigatewayv2";
-import { LambdaProxyIntegration } from "@aws-cdk/aws-apigatewayv2-integrations";
-import { AttributeType, Table } from "@aws-cdk/aws-dynamodb";
-import { EventBus, Rule } from "@aws-cdk/aws-events";
-import { LambdaFunction } from "@aws-cdk/aws-events-targets";
-import { Policy, PolicyStatement } from "@aws-cdk/aws-iam";
-import { Runtime, Tracing } from "@aws-cdk/aws-lambda";
-import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
-import { CfnOutput } from "@aws-cdk/core";
+import { Construct } from "constructs";
+import { Stack, StackProps, CfnOutput } from "aws-cdk-lib"; // core constructs
+import { HttpApi, HttpMethod } from "@aws-cdk/aws-apigatewayv2-alpha"; // experimental
+import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha"; // experimental
+import { aws_dynamodb as dynamodb } from "aws-cdk-lib";
+import { aws_events as events } from "aws-cdk-lib";
+import { aws_events_targets as events_targets } from "aws-cdk-lib";
+import { aws_iam as iam } from "aws-cdk-lib";
+import { aws_lambda as lambda } from "aws-cdk-lib";
+import { aws_lambda_nodejs as lambda_nodejs } from "aws-cdk-lib";
 
 const DUMMY_PACKAGE_JSON =
   '{\n\t\\"name\\": \\"dummy\\",\n\t\\"version\\": \\"0.0.1\\"\n}';
@@ -21,36 +21,36 @@ const commandHooks = {
   beforeInstall: () => [],
 };
 
-export class CdkDayStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class CdkDayStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // ###################################################
     // Translation DDB table
     // ###################################################
-    const translateTable = new Table(this, "TranslateTable", {
-      partitionKey: { name: "id", type: AttributeType.STRING },
-      sortKey: { name: "language", type: AttributeType.STRING },
+    const translateTable = new dynamodb.Table(this, "TranslateTable", {
+      partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "language", type: dynamodb.AttributeType.STRING },
     });
 
     // ###################################################
     // Translation EventBridge bus
     // ###################################################
-    const translateBus = new EventBus(this, "TranslateBus", {
+    const translateBus = new events.EventBus(this, "TranslateBus", {
       eventBusName: "TranslateBus",
     });
 
     // ###################################################
     // Put translation function
     // ###################################################
-    const putTranslationFunction = new NodejsFunction(
+    const putTranslationFunction = new lambda_nodejs.NodejsFunction(
       this,
       "PutTranslationFunction",
       {
-        runtime: Runtime.NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_14_X,
         entry: "app/put-translation/src/app.ts",
         handler: "handler",
-        tracing: Tracing.ACTIVE,
+        tracing: lambda.Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
@@ -65,13 +65,13 @@ export class CdkDayStack extends cdk.Stack {
 
     translateBus.grantPutEventsTo(putTranslationFunction);
 
-    const translatePolicyStatement = new PolicyStatement({
+    const translatePolicyStatement = new iam.PolicyStatement({
       actions: ["translate:TranslateText"],
       resources: ["*"],
     });
 
     putTranslationFunction.role?.attachInlinePolicy(
-      new Policy(this, "PutTranslatePolicy", {
+      new iam.Policy(this, "PutTranslatePolicy", {
         statements: [translatePolicyStatement],
       })
     );
@@ -79,14 +79,14 @@ export class CdkDayStack extends cdk.Stack {
     // ###################################################
     // Get translations function
     // ###################################################
-    const getTranslationFunction = new NodejsFunction(
+    const getTranslationFunction = new lambda_nodejs.NodejsFunction(
       this,
       "GetTranslationFunction",
       {
-        runtime: Runtime.NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_14_X,
         entry: "app/get-translation/src/app.ts",
         handler: "handler",
-        tracing: Tracing.ACTIVE,
+        tracing: lambda.Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
@@ -104,14 +104,14 @@ export class CdkDayStack extends cdk.Stack {
     // ###################################################
     // Save translations function
     // ###################################################
-    const saveTranslationFunction = new NodejsFunction(
+    const saveTranslationFunction = new lambda_nodejs.NodejsFunction(
       this,
       "SaveTranslationFunction",
       {
-        runtime: Runtime.NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_14_X,
         entry: "app/save-translation/src/app.ts",
         handler: "handler",
-        tracing: Tracing.ACTIVE,
+        tracing: lambda.Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
@@ -129,10 +129,10 @@ export class CdkDayStack extends cdk.Stack {
     // ###################################################
     // EventBridge Rule
     // ###################################################
-    new Rule(this, "SaveTranslationRule", {
+    new events.Rule(this, "SaveTranslationRule", {
       eventBus: translateBus,
       eventPattern: { detailType: ["translation"] },
-      targets: [new LambdaFunction(saveTranslationFunction)],
+      targets: [new events_targets.LambdaFunction(saveTranslationFunction)],
     });
 
     // ###################################################
@@ -143,14 +143,16 @@ export class CdkDayStack extends cdk.Stack {
     translateAPI.addRoutes({
       path: "/",
       methods: [HttpMethod.POST],
-      integration: new LambdaProxyIntegration({
-        handler: putTranslationFunction,
-      }),
+      integration: new HttpLambdaIntegration(
+        "PutTranslationIntegration",
+        putTranslationFunction
+      ),
     });
 
-    const getProxy = new LambdaProxyIntegration({
-      handler: getTranslationFunction,
-    });
+    const getProxy = new HttpLambdaIntegration(
+      "GetTranslationIntegration",
+      getTranslationFunction
+    );
 
     translateAPI.addRoutes({
       path: "/{id}",
