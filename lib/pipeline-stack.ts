@@ -46,17 +46,8 @@ export class PipelineStack extends Stack {
     });
 
     pipeline.addStage(devStage, {
-      pre: [
-        new ShellStep("Diff", {
-          input: synthStep,
-          commands: ["npx cdk -a ./cdk.out/assembly-CdkTranslator diff"],
-        }),
-        new ManualApprovalStep("CdkDiffApproval", {
-          comment: "Approve to apply these changes",
-        }),
-      ],
       post: [
-        new ManualApprovalStep("DeployToProdApproval", {
+        new ManualApprovalStep("DeployApproval", {
           comment: "Approve to deploy to the next stage",
         }),
       ],
