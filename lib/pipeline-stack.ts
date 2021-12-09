@@ -1,5 +1,5 @@
 import { Construct } from "constructs";
-import { Stack, StackProps, Stage } from "aws-cdk-lib"; // core constructs
+import { Environment, Stack, StackProps } from "aws-cdk-lib"; // core constructs
 
 import { aws_codestarconnections as codestarconnections } from "aws-cdk-lib";
 import {
@@ -11,8 +11,13 @@ import {
 
 import { CdkTranslatorStage } from "./cdk-translator-stage";
 
+interface PipelineStackProps extends StackProps {
+  devEnvironment: Environment;
+  prodEnvironment: Environment;
+}
+
 export class PipelineStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, props?: PipelineStackProps) {
     super(scope, id, props);
 
     const githubConnection = new codestarconnections.CfnConnection(
@@ -42,7 +47,7 @@ export class PipelineStack extends Stack {
     });
 
     const devStage = new CdkTranslatorStage(this, "Dev", {
-      env: { account: "493156571491", region: "eu-west-1" },
+      env: props?.devEnvironment,
     });
 
     pipeline.addStage(devStage, {
@@ -54,7 +59,7 @@ export class PipelineStack extends Stack {
     });
 
     const prodStage = new CdkTranslatorStage(this, "Prod", {
-      env: { account: "729684387644", region: "eu-west-1" },
+      env: props?.prodEnvironment,
     });
 
     pipeline.addStage(prodStage);

@@ -21,17 +21,13 @@ const commandHooks = {
   beforeInstall: () => [],
 };
 
-export class CdkTranslatorStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+interface CdkTranslatorStackProps extends StackProps {
+  translateTable: dynamodb.Table;
+}
 
-    // ###################################################
-    // Translation DDB table
-    // ###################################################
-    const translateTable = new dynamodb.Table(this, "TranslateTable", {
-      partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "language", type: dynamodb.AttributeType.STRING },
-    });
+export class CdkTranslatorStack extends Stack {
+  constructor(scope: Construct, id: string, props?: CdkTranslatorStackProps) {
+    super(scope, id, props);
 
     // ###################################################
     // Translation EventBridge bus
@@ -94,12 +90,12 @@ export class CdkTranslatorStack extends Stack {
           commandHooks,
         },
         environment: {
-          TRANSLATE_TABLE: translateTable.tableName,
+          TRANSLATE_TABLE: props?.translateTable.tableName || "",
         },
       }
     );
 
-    translateTable.grantReadData(getTranslationFunction);
+    props?.translateTable.grantReadData(getTranslationFunction);
 
     // ###################################################
     // Save translations function
@@ -119,12 +115,12 @@ export class CdkTranslatorStack extends Stack {
           commandHooks,
         },
         environment: {
-          TRANSLATE_TABLE: translateTable.tableName,
+          TRANSLATE_TABLE: props?.translateTable.tableName || "",
         },
       }
     );
 
-    translateTable.grantWriteData(saveTranslationFunction);
+    props?.translateTable.grantWriteData(saveTranslationFunction);
 
     // ###################################################
     // EventBridge Rule
@@ -183,9 +179,6 @@ export class CdkTranslatorStack extends Stack {
     });
     new CfnOutput(this, "Translation Bus", {
       value: translateBus.eventBusName,
-    });
-    new CfnOutput(this, "Translation Table", {
-      value: translateTable.tableName,
     });
   }
 }
