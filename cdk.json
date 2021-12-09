@@ -22,8 +22,7 @@
       "package*.json",
       "coverage",
       "node_modules",
-      "test",
-      "pipeline"
+      "test"
     ]
   },
   "context": {

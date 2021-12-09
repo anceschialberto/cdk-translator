@@ -10,7 +10,6 @@ import {
 } from "aws-cdk-lib/pipelines";
 
 import { CdkTranslatorStage } from "./cdk-translator-stage";
-import { BuildSpec } from "aws-cdk-lib/aws-codebuild";
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
