@@ -49,7 +49,7 @@ export class PipelineStack extends Stack {
       pre: [
         new ShellStep("Diff", {
           input: synthStep,
-          commands: ["npx cdk diff -a cdk.out/assembly-CdkTranslator"],
+          commands: ["npx cdk -a cdk.out/assembly-CdkTranslator diff"],
         }),
         new ManualApprovalStep("CdkDiffApproval", {
           comment: "Approve to apply these changes",
