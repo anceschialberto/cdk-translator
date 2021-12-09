@@ -1,5 +1,5 @@
 import { Construct } from "constructs";
-import { Stack, StackProps } from "aws-cdk-lib"; // core constructs
+import { Stack, StackProps, Stage } from "aws-cdk-lib"; // core constructs
 
 import { aws_codestarconnections as codestarconnections } from "aws-cdk-lib";
 import {
@@ -24,32 +24,48 @@ export class PipelineStack extends Stack {
       }
     );
 
+    const source = CodePipelineSource.connection(
+      "anceschialberto/cdk-translator",
+      "main",
+      { connectionArn: githubConnection.attrConnectionArn }
+    );
+
+    const synthStep = new ShellStep("Synth", {
+      input: source,
+      commands: ["npm i -g npm@8", "npm ci", "npx cdk synth"],
+    });
+
     // Pipeline creation starts
     const pipeline = new CodePipeline(this, "Pipeline", {
-      synth: new ShellStep("Synth", {
-        input: CodePipelineSource.connection(
-          "anceschialberto/cdk-translator",
-          "main",
-          { connectionArn: githubConnection.attrConnectionArn }
-        ),
-        commands: ["npm i -g npm@8", "npm ci", "npx cdk synth"],
-      }),
+      synth: synthStep,
       crossAccountKeys: true,
     });
 
-    pipeline.addStage(
-      new CdkTranslatorStage(this, "Dev", {
-        env: { account: "493156571491", region: "eu-west-1" },
-      }),
-      {
-        post: [new ManualApprovalStep("Approval")],
-      }
-    );
+    const devStage = new CdkTranslatorStage(this, "Dev", {
+      env: { account: "493156571491", region: "eu-west-1" },
+    });
 
-    pipeline.addStage(
-      new CdkTranslatorStage(this, "Prod", {
-        env: { account: "729684387644", region: "eu-west-1" },
-      })
-    );
+    pipeline.addStage(devStage, {
+      pre: [
+        new ShellStep("Diff", {
+          input: synthStep,
+          commands: ["npx cdk diff -a cdk.out/assembly-CdkTranslator"],
+        }),
+        new ManualApprovalStep("CdkDiffApproval", {
+          comment: "Approve to apply these changes",
+        }),
+      ],
+      post: [
+        new ManualApprovalStep("DeployToProdApproval", {
+          comment: "Approve to deploy to the next stage",
+        }),
+      ],
+    });
+
+    const prodStage = new CdkTranslatorStage(this, "Prod", {
+      env: { account: "729684387644", region: "eu-west-1" },
+    });
+
+    pipeline.addStage(prodStage);
   }
 }
