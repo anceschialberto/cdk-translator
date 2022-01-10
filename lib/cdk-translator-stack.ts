@@ -3,31 +3,33 @@ import { Construct } from "constructs";
 import { Stack, StackProps, CfnOutput } from "aws-cdk-lib"; // core constructs
 import { HttpApi, HttpMethod } from "@aws-cdk/aws-apigatewayv2-alpha"; // experimental
 import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha"; // experimental
-import { aws_dynamodb as dynamodb } from "aws-cdk-lib";
 import { aws_events as events } from "aws-cdk-lib";
 import { aws_events_targets as events_targets } from "aws-cdk-lib";
 import { aws_iam as iam } from "aws-cdk-lib";
 import { aws_lambda as lambda } from "aws-cdk-lib";
 import { aws_lambda_nodejs as lambda_nodejs } from "aws-cdk-lib";
-
-const DUMMY_PACKAGE_JSON =
-  '{\n\t\\"name\\": \\"dummy\\",\n\t\\"version\\": \\"0.0.1\\"\n}';
-
-const commandHooks = {
-  beforeBundling: () => [],
-  afterBundling(inputDir: string, outputDir: string): string[] {
-    return [`printf "${DUMMY_PACKAGE_JSON}" > ${outputDir}/package.json`];
-  },
-  beforeInstall: () => [],
-};
+import { CdkTranslatorDatabaseStack } from "./cdk-translator-database-stack";
 
 interface CdkTranslatorStackProps extends StackProps {
-  translateTable: dynamodb.Table;
+  defaultBranch: string;
+  branch: string;
 }
 
 export class CdkTranslatorStack extends Stack {
   constructor(scope: Construct, id: string, props?: CdkTranslatorStackProps) {
     super(scope, id, props);
+
+    const { defaultBranch, branch } = props as CdkTranslatorStackProps;
+
+    const databaseStack = new CdkTranslatorDatabaseStack(
+      this,
+      `CdkTranslatorDatabaseStack-${branch}`,
+      {
+        terminationProtection: defaultBranch === branch,
+      }
+    );
+
+    const translateTable = databaseStack.translateTable;
 
     // ###################################################
     // Translation EventBridge bus
@@ -44,14 +46,13 @@ export class CdkTranslatorStack extends Stack {
       "PutTranslationFunction",
       {
         runtime: lambda.Runtime.NODEJS_14_X,
-        entry: "app/put-translation/src/app.ts",
+        entry: "services/put-translation/src/app.ts",
         handler: "handler",
         tracing: lambda.Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
           },
-          commandHooks,
         },
         environment: {
           TRANSLATE_BUS: translateBus.eventBusName,
@@ -80,22 +81,21 @@ export class CdkTranslatorStack extends Stack {
       "GetTranslationFunction",
       {
         runtime: lambda.Runtime.NODEJS_14_X,
-        entry: "app/get-translation/src/app.ts",
+        entry: "services/get-translation/src/app.ts",
         handler: "handler",
         tracing: lambda.Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
           },
-          commandHooks,
         },
         environment: {
-          TRANSLATE_TABLE: props?.translateTable.tableName || "",
+          TRANSLATE_TABLE: translateTable.tableName || "",
         },
       }
     );
 
-    props?.translateTable.grantReadData(getTranslationFunction);
+    translateTable.grantReadData(getTranslationFunction);
 
     // ###################################################
     // Save translations function
@@ -105,22 +105,21 @@ export class CdkTranslatorStack extends Stack {
       "SaveTranslationFunction",
       {
         runtime: lambda.Runtime.NODEJS_14_X,
-        entry: "app/save-translation/src/app.ts",
+        entry: "services/save-translation/src/app.ts",
         handler: "handler",
         tracing: lambda.Tracing.ACTIVE,
         bundling: {
           environment: {
             NODE_ENV: "production",
           },
-          commandHooks,
         },
         environment: {
-          TRANSLATE_TABLE: props?.translateTable.tableName || "",
+          TRANSLATE_TABLE: translateTable.tableName || "",
         },
       }
     );
 
-    props?.translateTable.grantWriteData(saveTranslationFunction);
+    translateTable.grantWriteData(saveTranslationFunction);
 
     // ###################################################
     // EventBridge Rule

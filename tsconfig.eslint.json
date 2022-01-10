@@ -10,7 +10,8 @@
   "include": [
     "bin/**/*.ts",
     "lib/**/*.ts",
-    "app/**/*.ts",
+    "services/**/*.ts",
+    "cicd/**/*.ts",
     "test/**/*.ts",
     ".eslintrc.js",
     "jest.config.js"

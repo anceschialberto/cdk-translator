@@ -1,27 +1,33 @@
-import * as cdk from "aws-cdk-lib";
+import { Stage, StageProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { CdkTranslatorDatabaseStack } from "./cdk-translator-database-stack";
+
 import { CdkTranslatorStack } from "./cdk-translator-stack";
+
+interface CdkTranslatorStageProps extends StageProps {
+  defaultBranch: string;
+  branch: string;
+}
 
 /**
  * The application
  *
  * May consist of one or more Stacks (here, only one)
  */
-export class CdkTranslatorStage extends cdk.Stage {
-  constructor(scope: Construct, id: string, props?: cdk.StageProps) {
+export class CdkTranslatorStage extends Stage {
+  mainStackName: string;
+
+  constructor(scope: Construct, id: string, props?: CdkTranslatorStageProps) {
     super(scope, id, props);
 
-    const database = new CdkTranslatorDatabaseStack(
-      this,
-      "CdkTranslatorDatabaseStack",
-      {
-        terminationProtection: true,
-      }
-    );
+    const { defaultBranch, branch } = props as CdkTranslatorStageProps;
 
-    new CdkTranslatorStack(this, "CdkTranslatorStack", {
-      translateTable: database.translateTable,
+    const mainStackName = "CdkTranslatorStack";
+
+    new CdkTranslatorStack(this, `${mainStackName}-${branch}`, {
+      defaultBranch,
+      branch,
     });
+
+    this.mainStackName = mainStackName;
   }
 }
