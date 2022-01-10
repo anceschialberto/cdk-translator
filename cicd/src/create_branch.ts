@@ -66,7 +66,9 @@ export const handler: APIGatewayProxyHandlerV2<void> = async (event) => {
     );
 
     await codeBuild.send(
-      new StartBuildCommand({ projectName: `CodeBuild-${branch}-create` })
+      new StartBuildCommand({
+        projectName: `${CODEBUILD_NAME_PREFIX}-${branch}-create`,
+      })
     );
   }
 };

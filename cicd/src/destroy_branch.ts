@@ -41,7 +41,7 @@ export const handler: APIGatewayProxyHandlerV2<void> = async (event) => {
         description: "Build project to destroy branch pipeline",
         source: {
           type: "S3",
-          location: `${ARTIFACT_BUCKET_NAME}/${branch}/CodeBuild-${branch}-create/`,
+          location: `${ARTIFACT_BUCKET_NAME}/${branch}/${CODEBUILD_NAME_PREFIX}-${branch}-create/`,
           buildspec: generateBuildSpec(branch),
         },
         artifacts: {
@@ -57,15 +57,21 @@ export const handler: APIGatewayProxyHandlerV2<void> = async (event) => {
     );
 
     await codeBuild.send(
-      new StartBuildCommand({ projectName: `CodeBuild-${branch}-destroy` })
+      new StartBuildCommand({
+        projectName: `${CODEBUILD_NAME_PREFIX}-${branch}-destroy`,
+      })
     );
 
     await codeBuild.send(
-      new DeleteProjectCommand({ name: `CodeBuild-${branch}-destroy` })
+      new DeleteProjectCommand({
+        name: `${CODEBUILD_NAME_PREFIX}-${branch}-destroy`,
+      })
     );
 
     await codeBuild.send(
-      new DeleteProjectCommand({ name: `CodeBuild-${branch}-create` })
+      new DeleteProjectCommand({
+        name: `${CODEBUILD_NAME_PREFIX}-${branch}-create`,
+      })
     );
   }
 };
